@@ -42,7 +42,7 @@ func main() {
 				log.Fatalf("produce failed: %s", err.Error())
 			}
 		case "csv":
-			if err := produce(ctx, cfg, client); err != nil {
+			if err := produceCSV(ctx, cfg, client); err != nil {
 				log.Fatalf("produce failed: %s", err.Error())
 			}
 		}
@@ -51,4 +51,11 @@ func main() {
 			log.Fatalf("consume failed: %s", err.Error())
 		}
 	}
+
+	if cfg.SetKey != "" {
+		if err := writeKey(ctx, cfg, client); err != nil {
+			log.Fatalf("failed to write key: %s", err.Error())
+		}
+	}
+
 }

@@ -12,6 +12,29 @@ import (
 	redis "github.com/go-redis/redis/v7"
 )
 
+func writeKey(ctx context.Context, cfg *Config, client redis.UniversalClient) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+		}
+
+		b, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			return fmt.Errorf("Read failed: %s", err.Error())
+		}
+
+		if _, err := client.Set(cfg.SetKey, b, 0).Result(); err != nil {
+			return fmt.Errorf("SET failed: %s", err.Error())
+		}
+
+		break
+	}
+
+	return nil
+}
+
 func produceBlob(ctx context.Context, cfg *Config, client redis.UniversalClient) error {
 
 	for {
@@ -44,7 +67,7 @@ func produceBlob(ctx context.Context, cfg *Config, client redis.UniversalClient)
 	return nil
 }
 
-func produce(ctx context.Context, cfg *Config, client redis.UniversalClient) error {
+func produceCSV(ctx context.Context, cfg *Config, client redis.UniversalClient) error {
 
 	r := csv.NewReader(os.Stdin)
 	r.ReuseRecord = true
